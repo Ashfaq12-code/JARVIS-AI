@@ -1,0 +1,61 @@
+.field {
+  position: relative;
+  width: min(86vw, 900px);
+  height: min(80vh, 760px);
+  min-height: 430px;
+  display: grid;
+  place-items: center;
+  overflow: visible;
+  filter: drop-shadow(0 0 28px rgba(126, 252, 160, 0.24));
+}
+
+.field::before {
+  position: absolute;
+  inset: 12% 18%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(126, 252, 160, 0.22), transparent 62%);
+  content: "";
+  filter: blur(24px);
+}
+
+.core {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.core::before {
+  position: absolute;
+  inset: 20% 20% 20% 20%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(126, 252, 160, 0.46) 0%, rgba(126, 252, 160, 0.18) 30%, rgba(126, 252, 160, 0.08) 54%, transparent 72%);
+  content: "";
+  filter: blur(22px);
+  animation: corePulse 4s ease-in-out infinite;
+}
+
+.ring, .arc, .radial, .connection { position: absolute; pointer-events: none; }
+.ring { z-index: 1; width: 78%; aspect-ratio: 1; border: 1px solid rgba(126, 252, 160, 0.18); border-radius: 50%; box-shadow: 0 0 28px rgba(90, 232, 123, 0.08), inset 0 0 28px rgba(90, 232, 123, 0.04); }
+.ringOne { transform: rotate(24deg) scaleY(0.54); animation: rotateRing 28s linear infinite; }
+.ringTwo { width: 87%; transform: rotate(-56deg) scaleY(0.34); border-color: rgba(126, 252, 160, 0.12); animation: rotateRingReverse 36s linear infinite; }
+.arc { z-index: 2; width: 92%; aspect-ratio: 1; border: 1px solid transparent; border-top-color: rgba(126, 252, 160, 0.42); border-bottom-color: rgba(126, 252, 160, 0.12); border-radius: 50%; transform: rotate(32deg) scaleY(0.42); animation: arcSpin 18s linear infinite; }
+.arcTwo { transform: rotate(-28deg) scaleY(0.62); border-top-color: rgba(126, 252, 160, 0.24); animation-duration: 23s; animation-direction: reverse; }
+.radial { z-index: 1; width: 1px; height: 76%; background: linear-gradient(transparent, rgba(126, 252, 160, 0.24), transparent); }
+.radialOne { transform: rotate(90deg); }
+.radialTwo { transform: rotate(35deg); opacity: 0.42; }
+.connection { z-index: 4; height: 1px; width: 15%; background: linear-gradient(90deg, transparent, rgba(126, 252, 160, 0.52)); animation: connectionPulse 3s ease-in-out infinite; }
+.connectionLeft { left: 8%; }
+.connectionRight { right: 8%; transform: rotate(180deg); }
+.connectionBottom { bottom: 7%; width: 30%; transform: rotate(90deg); opacity: 0.4; }
+@keyframes rotateRing { to { transform: rotate(384deg) scaleY(0.54); } }
+@keyframes rotateRingReverse { to { transform: rotate(-416deg) scaleY(0.34); } }
+@keyframes arcSpin { to { transform: rotate(392deg) scaleY(0.38); } }
+@keyframes connectionPulse { 0%, 100% { opacity: 0.25; } 50% { opacity: 0.8; } }
+@keyframes corePulse { 0%, 100% { transform: scale(0.96); opacity: 0.7; } 50% { transform: scale(1.06); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .field * { animation-duration: 0.001ms !important; } }
+@media (max-width: 700px) {
+  .field { width: 100%; height: min(58vh, 440px); min-height: 300px; }
+}

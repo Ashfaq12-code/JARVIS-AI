@@ -1,0 +1,11 @@
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+websockets>=12.0
+openai>=1.30.0
+google-genai>=1.0.0
+pydantic>=2.7.0
+pydantic-settings>=2.2.0
+python-dotenv>=1.0.1
+psutil>=5.9.8
+requests>=2.31.0
+pywinauto>=0.6.8

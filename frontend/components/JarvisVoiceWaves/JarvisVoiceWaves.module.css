@@ -1,0 +1,15 @@
+.waveDock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  min-height: 34px;
+}
+
+.canvas {
+  display: block;
+  filter: drop-shadow(0 0 10px rgba(90, 232, 123, 0.45));
+}
+
+

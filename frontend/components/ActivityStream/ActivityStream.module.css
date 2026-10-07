@@ -1,0 +1,10 @@
+.stream { width: min(100%, 230px); color: #71957c; font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.heading { display: flex; align-items: center; gap: 8px; color: #d7f5dc; font-size: 0.66rem; letter-spacing: 0.18em; }
+.heading span { width: 5px; height: 5px; background: #66dd88; box-shadow: 0 0 9px #66dd88; }
+.line { height: 1px; margin: 12px 0 4px; background: linear-gradient(90deg, rgba(102, 221, 136, 0.5), transparent); }
+.stream ol { display: grid; gap: 7px; margin: 0; padding: 0; list-style: none; }
+.stream li { display: grid; grid-template-columns: auto 1fr; gap: 3px 8px; padding: 5px 0; border-bottom: 1px solid rgba(110, 198, 126, 0.1); }
+.stream time { color: #4c9d66; }
+.stream li span { color: #badbc0; }
+.stream small { grid-column: 2; color: #6c9b77; font-size: 0.51rem; letter-spacing: 0.05em; }
+.empty { color: #54735d; }

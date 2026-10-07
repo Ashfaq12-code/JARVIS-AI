@@ -1,0 +1,155 @@
+==================================================
+COMPUTER CONTROL / SYSTEM ACCESS
+==================================================
+
+Build a secure computer-control layer so JARVIS can interact with the
+local computer through explicitly implemented tools.
+
+IMPORTANT:
+The OpenAI API key alone does NOT provide computer access.
+JARVIS must use local tools/services implemented by this application.
+
+Create a modular system-control layer capable of:
+
+1. Open approved applications
+2. Close approved applications
+3. Read selected files
+4. Create files
+5. Edit files
+6. Create folders
+7. Search files
+8. Get system information
+9. Open websites
+10. Navigate browser workflows where supported
+11. Perform approved keyboard/mouse automation
+12. Run approved terminal commands
+13. Monitor application/task status
+14. Manage JARVIS tasks
+
+==================================================
+SECURITY
+==================================================
+
+NEVER give the AI unrestricted operating-system access.
+
+Every computer-control operation must pass through a permission layer.
+
+Permission levels:
+
+SAFE
+- Read system information
+- Open approved websites
+- Calculator
+- View selected files
+
+CONFIRMATION_REQUIRED
+- Create/delete files
+- Modify files
+- Install software
+- Run commands that change the system
+- Send messages
+- Make external actions
+
+RESTRICTED
+- Security settings
+- Credentials/passwords
+- Financial actions
+- Destructive system operations
+- Disabling security software
+- Arbitrary unrestricted shell execution
+
+Before a CONFIRMATION_REQUIRED operation, show the user:
+
+JARVIS wants to:
+[EXACT ACTION]
+
+Target:
+[APPLICATION / FILE / COMMAND]
+
+Buttons:
+[Allow Once]
+[Deny]
+
+Never execute the action before confirmation.
+
+==================================================
+NATURAL LANGUAGE COMPUTER CONTROL
+==================================================
+
+The user should be able to say things such as:
+
+"JARVIS, open Chrome."
+
+"JARVIS, open my Projects folder."
+
+"JARVIS, create a folder called JARVIS Projects."
+
+"JARVIS, search my computer for the React project."
+
+"JARVIS, open this website."
+
+"JARVIS, show me my system information."
+
+"JARVIS, run this approved development command."
+
+JARVIS must translate the request into a structured tool call.
+
+Example:
+
+User:
+"Open Chrome."
+
+AI:
+{
+  tool: "open_application",
+  target: "Chrome"
+}
+
+The local tool executes the action.
+
+Then JARVIS reports the actual result.
+
+JARVIS must NEVER claim an action was completed unless the local tool
+actually returned a successful result.
+
+==================================================
+WINDOWS SUPPORT
+==================================================
+
+The primary development environment is Windows.
+
+Design the system-control layer so Windows-specific functionality is
+isolated from the main application.
+
+Do not place operating-system commands directly inside React components.
+
+Create a dedicated service/tool layer.
+
+Keep the architecture extensible so macOS/Linux support can be added later.
+
+==================================================
+AUDIT LOG
+==================================================
+
+Record computer-control actions in an activity log:
+
+timestamp
+user request
+tool used
+target
+permission level
+confirmation status
+result
+
+NEVER store API keys, passwords, authentication tokens, or other secrets.
+
+==================================================
+IMPORTANT
+==================================================
+
+Do not implement unrestricted remote-control functionality.
+
+The user must always remain in control.
+
+Build the computer-control layer incrementally and test every tool
+before enabling it.

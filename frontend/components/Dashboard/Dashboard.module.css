@@ -1,0 +1,10 @@
+.dashboard {
+  min-height: 100vh;
+  color: #e6f8e9;
+  background: radial-gradient(circle at 50% 42%, rgba(28, 120, 54, 0.18), transparent 29%),
+    linear-gradient(135deg, #010302 0%, #07130b 38%, #020805 100%);
+}
+
+.developerTools {
+  display: none !important;
+}

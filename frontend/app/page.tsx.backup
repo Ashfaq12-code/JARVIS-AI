@@ -1,0 +1,107 @@
+"use client";
+
+import { useState } from "react";
+import PermissionModal, { type PendingAction } from "../components/JarvisFace/PermissionModal";
+
+export default function Home() {
+  const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
+  const [statusMessage, setStatusMessage] = useState<string>("System ready. Reactive HUD and 3D Avatar initialized.");
+  const [lastResult, setLastResult] = useState<string>("");
+
+  async function submitAction(action: string, params: Record<string, unknown> = {}, confirmed = false) {
+    const payload = {
+      action,
+      params: { ...params, confirmed },
+    };
+
+    try {
+      const response = await fetch("http://localhost:8001/api/action", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+
+      if (result?.status === "confirmation_required") {
+        setPendingAction({
+          action: result.action || action,
+          target: result.target || (params.target as string) || "system target",
+          required_level: result.required_level || "CONFIRMATION_REQUIRED",
+          message: result.message || "Confirmation required before this action can execute.",
+          prompt: result.prompt,
+          originalAction: action,
+          originalParams: params,
+        });
+        setStatusMessage("Confirmation required before this sensitive action can execute.");
+        return;
+      }
+
+      setPendingAction(null);
+      setLastResult(result?.message || "Action processed.");
+      setStatusMessage(result?.message || "Command completed successfully.");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to submit action.";
+      setStatusMessage(message);
+      setLastResult(message);
+    }
+  }
+
+  function handleAllowOnce() {
+    if (!pendingAction?.originalAction) {
+      setPendingAction(null);
+      return;
+    }
+
+    setStatusMessage("Allowing once and resubmitting the same action with confirmation enabled.");
+    submitAction(pendingAction.originalAction, pendingAction.originalParams || {}, true);
+  }
+
+  function handleDeny() {
+    setPendingAction(null);
+    setStatusMessage("Action denied. No sensitive action was executed.");
+    setLastResult("Denied by user.");
+  }
+
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center p-24">
+      <div className="flex w-full max-w-5xl flex-col items-center gap-6">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold tracking-[0.35em] text-cyan-400">JARVIS CORE</h1>
+          <p className="mt-2 text-slate-400">{statusMessage}</p>
+        </div>
+
+        <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-sm text-slate-200">
+          <button
+            type="button"
+            onClick={() => submitAction("launch_app", { app: "chrome" })}
+            className="rounded-lg border border-cyan-400/60 bg-slate-900 px-4 py-2 transition hover:border-cyan-300 hover:bg-slate-800"
+          >
+            Open Chrome
+          </button>
+          <button
+            type="button"
+            onClick={() => submitAction("volume_up", { step: 10 })}
+            className="rounded-lg border border-cyan-400/60 bg-slate-900 px-4 py-2 transition hover:border-cyan-300 hover:bg-slate-800"
+          >
+            Volume Up
+          </button>
+        </div>
+
+        {lastResult && (
+          <div className="rounded-xl border border-cyan-500/25 bg-slate-900/80 px-4 py-3 text-sm text-cyan-100">
+            {lastResult}
+          </div>
+        )}
+      </div>
+
+      <PermissionModal
+        pendingAction={pendingAction}
+        onAllowOnce={handleAllowOnce}
+        onDeny={handleDeny}
+      />
+    </main>
+  );
+}

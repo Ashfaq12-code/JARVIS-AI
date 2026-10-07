@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JARVIS AI - Operating HUD & Neural Face</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+  <div class="curved-display-wrapper">
+    <!-- WebGL Particle 3D Viewport -->
+    <canvas id="webgl-canvas"></canvas>
+
+    <!-- Sci-Fi HUD Layer (Visible in Step 1) -->
+    <div id="hud-container" class="hud-container visible">
+      <!-- Top Telemetry Header -->
+      <header class="hud-header">
+        <div class="telemetry-left">
+          <div class="temp-badge">
+            <span class="temp-val">28°C</span>
+            <span class="temp-sub">PARTLY CLOUDY</span>
+          </div>
+          <div class="system-stats">
+            <div class="stat-item">
+              <span class="stat-lbl">CPU</span>
+              <div class="stat-bar"><div id="cpu-fill" class="stat-fill" style="width: 18%;"></div></div>
+              <span id="cpu-text" class="stat-num">18%</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-lbl">RAM</span>
+              <div class="stat-bar"><div id="ram-fill" class="stat-fill" style="width: 42%;"></div></div>
+              <span id="ram-text" class="stat-num">42%</span>
+            </div>
+            <div class="stat-item clickable-vol" id="vol-stat-widget" title="Click to adjust volume">
+              <span class="stat-lbl">VOL</span>
+              <div class="stat-bar"><div id="vol-fill" class="stat-fill" style="width: 45%; background: #ffb700;"></div></div>
+              <span id="vol-text" class="stat-num">45%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hud-title-center">
+          <div class="pulse-indicator"></div>
+            <span class="hud-brand">JARVIS CORE // USER: ASHFAQ</span>
+            <span id="hud-clock" class="hud-clock" aria-live="polite">--:--:--</span>
+        </div>
+
+        <div class="telemetry-right">
+          <!-- Hand Motion Tracking Toggle -->
+          <button id="cam-track-btn" class="cam-track-btn" title="Toggle Webcam Hand Motion Tracking">
+            <span class="cam-dot"></span>
+            <span class="cam-lbl">HAND TRACK</span>
+          </button>
+
+          <!-- Step Quick Switcher -->
+          <div class="step-switcher">
+            <span class="step-lbl">STEPS:</span>
+            <button class="step-btn active" data-step="1">1: HUD</button>
+            <button class="step-btn" data-step="2">2: SWIRL</button>
+            <button class="step-btn" data-step="3">3: CONTOUR</button>
+            <button class="step-btn" data-step="4">4: SCAN</button>
+            <button class="step-btn" data-step="5">5: FACE</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- SVG Neural Orbit Lines -->
+      <svg id="network-lines" class="network-svg"></svg>
+
+      <!-- Center Core Overlay Ring -->
+      <div id="central-core-anchor" class="central-core">
+        <div class="ring outer-gold-ring"></div>
+        <div class="ring inner-cyan-ring"></div>
+        <div class="ring spinning-dashed-ring"></div>
+        <div class="core-glow-center"></div>
+      </div>
+
+      <!-- Skill Nodes (Branching out from Center Core) -->
+      <div id="nodes-container" class="nodes-container">
+        <!-- Left Side Nodes -->
+        <div class="node-item" id="node-strategist" data-action="ai_brain" style="top: 28%; left: 38%;">
+          <div class="node-ring"><div class="node-dot"></div></div>
+          <span class="node-label">Strategist</span>
+        </div>
+
+        <div class="node-item" id="node-researcher" data-action="search_web" style="top: 31%; left: 25%;">
+          <div class="node-ring"><div class="node-dot"></div></div>
+          <span class="node-label">Researcher</span>
+        </div>
+
+        <div class="node-item" id="node-chief" data-action="get_system_stats" style="top: 42%; left: 27%;">
+          <div class="node-ring"><div class="node-dot"></div></div>
+          <span class="node-label">Chief of staff</span>
+        </div>
+
+        <div class="node-item" id="node-sales" data-action="open_chrome" style="top: 49%; left: 23%;">
+          <div class="node-ring"><div class="node-dot"></div></div>
+          <span class="node-label">Sales</span>
+        </div>
+
+        <div class="node-item highlight-app-node" id="node-whatsapp" data-action="launch_app" data-app="whatsapp" style="top: 55%; left: 30%;">
+          <div class="node-ring pulse-green"><div class="node-dot green-dot"></div></div>
+          <span class="node-label">WhatsApp</span>
+        </div>
+
+        <div class="node-item highlight-app-node" id="node-developer" data-action="launch_app" data-app="code" style="top: 66%; left: 20%;">
+          <div class="node-ring"><div class="node-dot"></div></div>
+          <span class="node-label">VS Code</span>
+        </div>
+
+        <div class="node-item" id="node-ops" data-action="launch_app" data-app="taskmgr" style="top: 61%; left: 34%;">
+          <div class="node-ring"><div class="node-dot"></div></div>
+          <span class="node-label">Ops</span>
+        </div>
+
+        <div class="node-item highlight-app-node" id="node-calculator" data-action="launch_app" data-app="calc" style="top: 70%; left: 39%;">
+          <div class="node-ring"><div class="node-dot"></div></div>
+          <span class="node-label">Calculator</span>
+        </div>
+
+        <!-- Right Side Nodes -->
+        <div class="node-item" id="node-finance" data-action="launch_app" data-app="calc" style="top: 30%; left: 66%;">
+          <div class="node-ring"><div class="node-dot"></div></div>
+          <span class="node-label">Finance</span>
+        </div>
+
+        <div class="node-item" id="node-drive" data-action="launch_app" data-app="explorer" style="top: 29%; left: 86%;">
+          <div class="node-ring"><div class="node-dot"></div></div>
+          <span class="node-label">Drive</span>
+        </div>
+
+        <div class="node-item highlight-node" id="node-your-face" data-action="morph_face" style="top: 37%; left: 91%;">
+          <div class="node-ring pulse-gold"><div class="node-dot"></div></div>
+          <span class="node-label">your face</span>
+        </div>
+
+        <div class="node-item" id="node-editor" data-action="launch_app" data-app="notepad" style="top: 43%; left: 81%;">
+          <div class="node-ring"><div class="node-dot"></div></div>
+          <span class="node-label">Notepad</span>
+        </div>
+
+        <div class="node-item" id="node-memory" data-action="volume_mute" style="top: 48%; left: 70%;">
+          <div class="node-ring"><div class="node-dot"></div></div>
+          <span class="node-label">Mute Audio</span>
+        </div>
+
+        <div class="node-item" id="node-email" data-action="open_url" style="top: 51%; left: 88%;">
+          <div class="node-ring"><div class="node-dot"></div></div>
+          <span class="node-label">Email</span>
+        </div>
+
+        <div class="node-item highlight-vol-node" id="node-volume-ctrl" data-action="prompt_volume" style="top: 59%; left: 74%;">
+          <div class="node-ring pulse-gold"><div class="node-dot gold-dot"></div></div>
+          <span class="node-label">Volume Control</span>
+        </div>
+
+        <div class="node-item" id="node-calendar" data-action="volume_down" style="top: 66%; left: 83%;">
+          <div class="node-ring"><div class="node-dot"></div></div>
+          <span class="node-label">Volume -10%</span>
+        </div>
+
+        <div class="node-item" id="node-engineering" data-action="volume_up" style="top: 66%; left: 66%;">
+          <div class="node-ring"><div class="node-dot"></div></div>
+          <span class="node-label">Volume +10%</span>
+        </div>
+
+        <div class="node-item" id="node-crm" data-action="open_url" style="top: 72%; left: 59%;">
+          <div class="node-ring"><div class="node-dot"></div></div>
+          <span class="node-label">CRM</span>
+        </div>
+
+        <div class="node-item" id="node-social" data-action="open_chrome" style="top: 67%; left: 49%;">
+          <div class="node-ring"><div class="node-dot"></div></div>
+          <span class="node-label">Chrome</span>
+        </div>
+      </div>
+
+      <!-- Bottom Audio Wave & Listening Controller -->
+      <footer class="hud-footer">
+        <div class="audio-controller">
+          <canvas id="waveform-canvas" width="220" height="34"></canvas>
+          <div class="listening-tag">
+            <span class="listening-dots">•••</span>
+            <span class="listening-text">LISTENING</span>
+            <span class="listening-dots">•••</span>
+          </div>
+        </div>
+
+      </footer>
+    </div>
+
+    <!-- Hidden Webcam & Optical Motion Canvas for Real-Time Hand Tracking -->
+    <video id="webcam-feed" playsinline autoplay muted style="display:none"></video>
+    <canvas id="motion-canvas" width="80" height="60" style="display:none"></canvas>
+
+    <!-- Floating Left Chat Toggle Dot (Persistent across all steps: HUD, Swirl, Face) -->
+    <button id="chat-dot-toggle" class="chat-dot-toggle" title="Toggle Chat Panel">
+      <span class="chat-dot-pulse"></span>
+      <span class="chat-dot-label">CHAT</span>
+    </button>
+
+    <!-- Left-Side Transparent Sci-Fi Chat Panel (Persistent across all steps) -->
+    <aside id="chat-sidebar" class="chat-sidebar collapsed">
+      <div class="chat-sidebar-header">
+        <div class="chat-header-info">
+          <span class="chat-status-dot"></span>
+          <span class="chat-title">NEURAL CHAT // ASHFAQ</span>
+        </div>
+        <div class="chat-header-actions">
+          <button id="clear-chat-btn" class="chat-action-btn" title="Clear Conversation">CLEAR</button>
+          <button id="minimize-chat-btn" class="chat-action-btn" title="Minimize Panel">CLOSE</button>
+        </div>
+      </div>
+
+      <!-- Chat Messages Stream -->
+      <div id="chat-messages" class="chat-messages">
+        <!-- Welcome message -->
+        <div class="msg-card jarvis-msg">
+          <div class="msg-meta">
+            <span class="sender-badge jarvis-badge">JARVIS</span>
+            <span class="msg-time">ONLINE</span>
+          </div>
+          <div class="msg-body">
+            Day is going good, Ashfaq! All core systems are synchronized. You can speak or type to ask any question, discuss website development, control volume, or send WhatsApp messages.
+          </div>
+          <div class="msg-actions">
+            <button class="msg-btn copy-btn" onclick="copyMessageText(this)">COPY</button>
+            <button class="msg-btn fwd-btn" onclick="forwardToWhatsApp(this)">FORWARD</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-Time Voice Typing Indicator -->
+      <div id="typing-indicator" class="typing-indicator hidden">
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span class="typing-text">Transcribing voice stream...</span>
+      </div>
+    </aside>
+
+    <!-- Conversational Volume Modal -->
+    <div id="volume-dialog" class="futuristic-dialog hidden">
+      <div class="dialog-glow"></div>
+      <div class="dialog-content">
+        <div class="dialog-header">
+          <span class="dialog-title">AUDIO CONTROLLER</span>
+        </div>
+        <p class="dialog-msg" id="dialog-msg-text">
+          What percentage would you like me to set the volume to, Sir?
+        </p>
+        <div class="quick-percent-buttons">
+          <button class="vol-btn" data-vol="25">25%</button>
+          <button class="vol-btn highlight-vol" data-vol="45">45%</button>
+          <button class="vol-btn highlight-vol" data-vol="50">50%</button>
+          <button class="vol-btn" data-vol="75">75%</button>
+          <button class="vol-btn" data-vol="100">100%</button>
+        </div>
+        <div class="custom-vol-row">
+          <input type="range" id="custom-vol-slider" min="0" max="100" value="45" class="hud-slider" />
+          <span id="slider-vol-val" class="slider-label">45%</span>
+          <button id="apply-vol-btn" class="apply-btn">APPLY</button>
+        </div>
+        <button id="close-dialog-btn" class="close-dialog-btn">CANCEL</button>
+      </div>
+    </div>
+
+    <!-- Applications Hub Modal -->
+    <div id="apps-hub-dialog" class="futuristic-dialog hidden">
+      <div class="dialog-glow"></div>
+      <div class="dialog-content apps-grid-content">
+        <div class="dialog-header">
+          <span class="dialog-title">SYSTEM APPLICATIONS</span>
+        </div>
+        <div class="apps-grid">
+          <div class="app-card" data-app="whatsapp">
+            <span class="app-tag tag-green">WHATSAPP</span>
+            <span class="app-name">WhatsApp</span>
+            <span class="app-sub">Direct Messaging</span>
+          </div>
+          <div class="app-card" data-app="code">
+            <span class="app-tag tag-blue">VS CODE</span>
+            <span class="app-name">VS Code</span>
+            <span class="app-sub">Developer IDE</span>
+          </div>
+          <div class="app-card" data-app="calc">
+            <span class="app-tag tag-orange">CALC</span>
+            <span class="app-name">Calculator</span>
+            <span class="app-sub">Windows Math</span>
+          </div>
+          <div class="app-card" data-app="chrome">
+            <span class="app-tag tag-cyan">CHROME</span>
+            <span class="app-name">Google Chrome</span>
+            <span class="app-sub">Web Navigator</span>
+          </div>
+          <div class="app-card" data-app="notepad">
+            <span class="app-tag tag-yellow">NOTEPAD</span>
+            <span class="app-name">Notepad</span>
+            <span class="app-sub">Text Editor</span>
+          </div>
+          <div class="app-card" data-app="explorer">
+            <span class="app-tag tag-purple">EXPLORER</span>
+            <span class="app-name">File Explorer</span>
+            <span class="app-sub">Storage & Drive</span>
+          </div>
+          <div class="app-card" data-app="taskmgr">
+            <span class="app-tag tag-red">TASKMGR</span>
+            <span class="app-name">Task Manager</span>
+            <span class="app-sub">Performance</span>
+          </div>
+        </div>
+        <button id="close-apps-btn" class="close-dialog-btn">CLOSE</button>
+      </div>
+    </div>
+
+    <!-- Step 2, 3, 4, 5 Floating Sci-Fi HUD Text -->
+    <div id="avatar-telemetry" class="avatar-telemetry hidden">
+      <div class="status-badge">
+        <span id="avatar-status-label">STATUS: LISTENING</span>
+      </div>
+      <div id="assembly-progress" class="assembly-badge hidden">
+        <span id="assembly-text">ASSEMBLING... 25%</span>
+      </div>
+      <div class="action-hint">
+        <span>Click anywhere or press [1] to return to HUD</span>
+      </div>
+    </div>
+
+    <!-- Live Toast Notification -->
+    <div id="toast" class="toast-notification hidden">
+      <span class="toast-icon">⚡</span>
+      <span id="toast-text" class="toast-message">System Online</span>
+    </div>
+  </div>
+
+  <script src="/static/particle_avatar.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>
